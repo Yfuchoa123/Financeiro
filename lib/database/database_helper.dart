@@ -98,10 +98,11 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TABLE bills(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        description TEXT NOT NULL,
-        type TEXT NOT NULL,
-        value REAL NOT NULL,
-        dueDate TEXT NOT NULL,
+        description TEXT,
+        amount REAL,
+        type TEXT,
+        value REAL,
+        dueDate TEXT,
         isPaid INTEGER NOT NULL DEFAULT 0
       )
     ''');
