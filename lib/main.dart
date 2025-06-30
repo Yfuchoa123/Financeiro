@@ -261,18 +261,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   },
                 ),
                 CustomMenuItem(
-                  icon: Icons.credit_card_outlined,
-                  title: 'Cartões de crédito',
-                  isFavoritable: true,
+                  icon: Icons.credit_card,
+                  text: 'Cartões de Crédito',
+                  // A linha 'leading:' foi removida.
                   onTap: () {
-                    setState(() {
-                      _isCustomDrawerOpen = false;
-                    });
+                    Navigator.pop(context); // Fecha o drawer
                     Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                const CartoesDeCreditoScreen()));
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => CartoesDeCreditoScreen()),
+                    );
                   },
                 ),
                 CustomMenuItem(
