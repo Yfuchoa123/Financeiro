@@ -262,8 +262,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 CustomMenuItem(
                   icon: Icons.credit_card,
-                  text: 'Cartões de Crédito',
-                  // A linha 'leading:' foi removida.
+                  title: 'Cartões de Crédito', // CORRIGIDO: de 'text' para 'title'
                   onTap: () {
                     Navigator.pop(context); // Fecha o drawer
                     Navigator.push(
@@ -491,7 +490,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       SizedBox(
                         width: 400,
                         height: 350,
-                        child: const ResultadosDeCaixaCard(),
+                        child: const ResultadosDeCaixaCard(), // O erro do 'text' já estava corrigido por você aqui
                       ),
                       SizedBox(
                         width: 500,
