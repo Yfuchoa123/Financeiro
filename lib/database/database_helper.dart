@@ -1,10 +1,7 @@
-// lib/database/database_helper.dart
-
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DatabaseHelper {
-  // ... (código existente do Singleton) ...
   static final DatabaseHelper _instance = DatabaseHelper._internal();
   factory DatabaseHelper() => _instance;
   DatabaseHelper._internal();
@@ -21,42 +18,30 @@ class DatabaseHelper {
     String path = join(await getDatabasesPath(), 'meu_financeiro.db');
     return await openDatabase(
       path,
-      // IMPORTANTE: Incremente a versão do banco de dados
       version: 2,
       onCreate: _onCreate,
-      // onUpgrade é chamado quando a versão do DB aumenta
       onUpgrade: _onUpgrade,
     );
   }
 
-  // Cria as tabelas na primeira execução
   Future<void> _onCreate(Database db, int version) async {
+    // Ativa o suporte a foreign keys
+    await db.execute('PRAGMA foreign_keys = ON;');
     await _createTables(db);
   }
 
-  // Executa migrações quando a versão do DB muda
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    // Ativa o suporte a foreign keys
+    await db.execute('PRAGMA foreign_keys = ON;');
     if (oldVersion < 2) {
-      // Adiciona a nova tabela se estiver vindo da versão 1
-      await db.execute('''
-        CREATE TABLE transactions(
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          description TEXT NOT NULL,
-          type TEXT NOT NULL,
-          value REAL NOT NULL,
-          date TEXT NOT NULL,
-          accountId INTEGER,
-          categoryName TEXT,
-          isPaid INTEGER NOT NULL
-        )
-      ''');
+      // Garante que todas as tabelas estejam criadas ou atualizadas
+      await _createTables(db);
     }
   }
 
-  // Método centralizado para criar todas as tabelas
   Future<void> _createTables(Database db) async {
     await db.execute('''
-      CREATE TABLE categories(
+      CREATE TABLE IF NOT EXISTS categories(
         name TEXT PRIMARY KEY,
         type TEXT NOT NULL,
         isActive INTEGER NOT NULL,
@@ -65,7 +50,7 @@ class DatabaseHelper {
     ''');
 
     await db.execute('''
-      CREATE TABLE tags(
+      CREATE TABLE IF NOT EXISTS tags(
         name TEXT PRIMARY KEY,
         color INTEGER NOT NULL,
         isActive INTEGER NOT NULL
@@ -73,7 +58,7 @@ class DatabaseHelper {
     ''');
 
     await db.execute('''
-      CREATE TABLE accounts(
+      CREATE TABLE IF NOT EXISTS accounts(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         type TEXT NOT NULL,
@@ -83,7 +68,7 @@ class DatabaseHelper {
     ''');
 
     await db.execute('''
-      CREATE TABLE transactions(
+      CREATE TABLE IF NOT EXISTS transactions(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         description TEXT NOT NULL,
         type TEXT NOT NULL,
@@ -91,19 +76,22 @@ class DatabaseHelper {
         date TEXT NOT NULL,
         accountId INTEGER,
         categoryName TEXT,
-        isPaid INTEGER NOT NULL
+        isPaid INTEGER NOT NULL,
+        FOREIGN KEY (accountId) REFERENCES accounts(id) ON DELETE SET NULL,
+        FOREIGN KEY (categoryName) REFERENCES categories(name) ON DELETE SET NULL
       )
     ''');
 
     await db.execute('''
       CREATE TABLE IF NOT EXISTS bills(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        description TEXT,
-        amount REAL,
-        type TEXT,
-        value REAL,
-        dueDate TEXT,
+        description TEXT NOT NULL,
+        amount REAL NOT NULL,
+        type TEXT NOT NULL,
+        value REAL NOT NULL,
+        dueDate TEXT NOT NULL,
         isPaid INTEGER NOT NULL DEFAULT 0
+        -- Sugestão: adicione FOREIGN KEYs se precisar de relacionamento
       )
     ''');
   }
