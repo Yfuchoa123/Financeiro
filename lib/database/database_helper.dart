@@ -96,7 +96,7 @@ class DatabaseHelper {
     ''');
 
     await db.execute('''
-      CREATE TABLE bills(
+      CREATE TABLE IF NOT EXISTS bills(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         description TEXT,
         amount REAL,
