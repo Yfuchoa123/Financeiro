@@ -25,17 +25,26 @@ class DatabaseHelper {
   }
 
   Future<void> _onCreate(Database db, int version) async {
-    // Ativa o suporte a foreign keys
     await db.execute('PRAGMA foreign_keys = ON;');
     await _createTables(db);
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    // Ativa o suporte a foreign keys
     await db.execute('PRAGMA foreign_keys = ON;');
+
     if (oldVersion < 2) {
-      // Garante que todas as tabelas estejam criadas ou atualizadas
-      await _createTables(db);
+      // Tabelas novas ou alteradas na versão 2
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS bills(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          description TEXT NOT NULL,
+          amount REAL NOT NULL,
+          type TEXT NOT NULL,
+          value REAL NOT NULL,
+          dueDate TEXT NOT NULL,
+          isPaid INTEGER NOT NULL DEFAULT 0
+        )
+      ''');
     }
   }
 
@@ -91,7 +100,6 @@ class DatabaseHelper {
         value REAL NOT NULL,
         dueDate TEXT NOT NULL,
         isPaid INTEGER NOT NULL DEFAULT 0
-        -- Sugestão: adicione FOREIGN KEYs se precisar de relacionamento
       )
     ''');
   }
